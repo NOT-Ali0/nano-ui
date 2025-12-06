@@ -1,0 +1,152 @@
+<!-- 
+EXAMPLE: How to use translations in pricing page
+Replace the hardcoded strings with t() function calls
+-->
+
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { authStore } from '$lib/stores';
+	import { apiClient } from '$lib/api';
+	import { t } from '$lib/i18n'; // <-- Import translation function
+	import PriceCard from './PriceCard.svelte';
+	import BillingToggle from './BillingToggle.svelte';
+	import PriceOrbs from './PriceOrbs.svelte';
+
+	let isAnnual = $state(false);
+	let loading = $state(false);
+	let currentPlan = $state<string | null>(null);
+	let mounted = $state(false);
+
+	// ... existing code ...
+
+	interface PricingPlan {
+		name: string;
+		description: string;
+		monthlyPrice: number;
+		annualPrice: number;
+		features: string[];
+		highlighted: boolean;
+		cta: string;
+		planType?: string;
+		hideInAnnual?: boolean;
+	}
+
+	// Use translations for plan data
+	const plans: PricingPlan[] = [
+		{
+			name: t('pricing.freeTrial'),
+			description: t('pricing.freeTrialDesc'),
+			monthlyPrice: 0,
+			annualPrice: 0,
+			features: [
+				t('pricing.features.freeUploads', { count: 5 }),
+				t('pricing.features.basicOcr'),
+				t('pricing.features.limitedHistory', { count: 5 }),
+				t('pricing.features.emailSupport')
+			],
+			highlighted: false,
+			cta: t('pricing.startFree'),
+			planType: 'FREE',
+			hideInAnnual: true
+		},
+		{
+			name: t('pricing.pro'),
+			description: t('pricing.proDesc'),
+			monthlyPrice: 9.99,
+			annualPrice: 7.99,
+			features: [
+				t('pricing.features.freeUploads', { count: 200 }),
+				t('pricing.features.highAccuracy'),
+				t('pricing.features.fullHistory'),
+				t('pricing.features.apiKey'),
+				t('pricing.features.dashboardAnalytics')
+			],
+			highlighted: true,
+			cta: t('pricing.upgradeToPro'),
+			planType: 'PRO_MONTHLY'
+		},
+		{
+			name: t('pricing.premium'),
+			description: t('pricing.premiumDesc'),
+			monthlyPrice: 29.99,
+			annualPrice: 24.99,
+			features: [
+				t('pricing.features.freeUploads', { count: 1000 }),
+				t('pricing.features.advancedOcr'),
+				t('pricing.features.unlimitedHistory'),
+				t('pricing.features.priorityApi'),
+				t('pricing.features.teamSeats', { count: 5 }),
+				t('pricing.features.prioritySupport')
+			],
+			highlighted: false,
+			cta: t('pricing.contactSales'),
+			planType: 'PREMIUM'
+		}
+	];
+
+	function getSavingsPercentage(plan: PricingPlan): number {
+		if (plan.monthlyPrice === 0) return 0;
+		const savings = ((plan.monthlyPrice - plan.annualPrice) / plan.monthlyPrice) * 100;
+		return Math.round(savings);
+	}
+
+	function getOverallSavings(): number {
+		const proPlan = plans.find((p) => p.name === t('pricing.pro'));
+		if (!proPlan) return 20;
+		return getSavingsPercentage(proPlan);
+	}
+
+	// ... rest of existing code ...
+</script>
+
+<div class="relative min-h-screen overflow-hidden">
+	<PriceOrbs />
+
+	<div class="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+		<!-- Header with translations -->
+		<div class="text-center mb-12 lg:mb-16 animate-fade-in">
+			<div class="inline-flex items-center gap-2 mb-4">
+				{#if isAnnual}
+					<span
+						class="px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-cyan-400 to-blue-500 text-white animate-fade-in"
+					>
+						{t('pricing.saveAnnually', { percentage: getOverallSavings() })}
+					</span>
+				{/if}
+			</div>
+			<h1
+				class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent"
+			>
+				{t('pricing.title')}
+			</h1>
+			<p class="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+				{t('pricing.subtitle')}
+			</p>
+		</div>
+
+		<!-- Billing Toggle -->
+		<div class="flex justify-center mb-12 lg:mb-16 animate-fade-in">
+			<BillingToggle bind:isAnnual />
+		</div>
+
+		<!-- Pricing Grid -->
+		<div
+			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto animate-fade-in"
+		>
+			{#each visiblePlans as plan, index}
+				<PriceCard
+					{plan}
+					price={getPrice(plan)}
+					isAnnual={isAnnual}
+					savings={getSavingsPercentage(plan)}
+					isCurrentPlan={currentPlan === plan.planType}
+					{loading}
+					onCtaClick={() => handleCtaClick(plan)}
+					style="animation-delay: {index * 100}ms"
+				/>
+			{/each}
+		</div>
+	</div>
+</div>
+

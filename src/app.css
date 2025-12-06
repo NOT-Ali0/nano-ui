@@ -1,0 +1,469 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	:root {
+		/* Light theme - Spec colors: #E3FDFD, #CBF1F5, #A6E3E9, #71C9CE */
+		--background: 180 100% 95%; /* #E3FDFD */
+		--foreground: 222 47% 11%;
+		--card: 180 100% 98%; /* #E3FDFD */
+		--card-foreground: 222 47% 11%;
+		--popover: 180 100% 98%;
+		--popover-foreground: 222 47% 11%;
+		--primary: 188 65% 60%; /* #71C9CE */
+		--primary-foreground: 0 0% 100%;
+		--secondary: 180 70% 90%; /* #CBF1F5 */
+		--secondary-foreground: 222 47% 11%;
+		--muted: 180 60% 92%; /* #A6E3E9 */
+		--muted-foreground: 215 16% 47%;
+		--accent: 180 70% 90%;
+		--accent-foreground: 222 47% 11%;
+		--destructive: 0 84% 60%;
+		--destructive-foreground: 0 0% 100%;
+		--border: 180 50% 85%;
+		--input: 180 50% 85%;
+		--ring: 188 65% 60%;
+		--radius: 0.75rem;
+		/* Global layout variables */
+		--container-max-width: 1280px;
+		--container-padding-mobile: 1rem;
+		--container-padding-tablet: 1.5rem;
+		--container-padding-desktop: 2rem;
+		--section-spacing-mobile: 3rem;
+		--section-spacing-tablet: 4rem;
+		--section-spacing-desktop: 5rem;
+	}
+
+	.dark {
+		/* Dark theme - Spec colors: #222831, #393E46, #00ADB5, #EEEEEE */
+		--background: 210 25% 15%; /* #222831 */
+		--foreground: 0 0% 93%; /* #EEEEEE */
+		--card: 210 20% 20%; /* #393E46 */
+		--card-foreground: 0 0% 93%;
+		--popover: 210 20% 20%;
+		--popover-foreground: 0 0% 93%;
+		--primary: 184 100% 35%; /* #00ADB5 */
+		--primary-foreground: 0 0% 100%;
+		--secondary: 210 15% 25%; /* #393E46 */
+		--secondary-foreground: 0 0% 93%;
+		--muted: 210 15% 25%;
+		--muted-foreground: 215 20% 65%;
+		--accent: 210 15% 25%;
+		--accent-foreground: 0 0% 93%;
+		--destructive: 0 62% 30%;
+		--destructive-foreground: 0 0% 100%;
+		--border: 210 15% 30%;
+		--input: 210 15% 30%;
+		--ring: 184 100% 35%;
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+	
+	html {
+		scroll-behavior: smooth;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	
+	body {
+		@apply bg-background text-foreground;
+		/* Global background with theme support */
+		background-image: 
+			radial-gradient(at 0% 0%, hsl(var(--primary) / 0.05) 0px, transparent 50%),
+			radial-gradient(at 100% 100%, hsl(var(--primary) / 0.05) 0px, transparent 50%);
+		background-attachment: fixed;
+		min-height: 100vh;
+	}
+	
+	.dark body {
+		background-image: 
+			radial-gradient(at 0% 0%, hsl(var(--primary) / 0.08) 0px, transparent 50%),
+			radial-gradient(at 100% 100%, hsl(var(--primary) / 0.08) 0px, transparent 50%);
+	}
+}
+
+/* RTL Support */
+html.rtl {
+	direction: rtl;
+}
+
+html.rtl * {
+	text-align: inherit;
+}
+
+/* RTL-specific adjustments */
+html.rtl .text-left {
+	text-align: right;
+}
+
+html.rtl .text-right {
+	text-align: left;
+}
+
+/* LTR-specific adjustments */
+html:not(.rtl) .text-left {
+	text-align: left;
+}
+
+html:not(.rtl) .text-right {
+	text-align: right;
+}
+
+/* RTL flex direction adjustments */
+html.rtl .flex-row {
+	flex-direction: row-reverse;
+}
+
+html.rtl .flex-row-reverse {
+	flex-direction: row;
+}
+
+/* RTL margin/padding adjustments */
+html.rtl .ml-auto {
+	margin-left: 0;
+	margin-right: auto;
+}
+
+html.rtl .mr-auto {
+	margin-right: 0;
+	margin-left: auto;
+}
+
+/* ============================================
+   GLOBAL LAYOUT SYSTEM
+   ============================================ */
+
+@layer components {
+	/* Global Container System - Automatically applied to all pages */
+	:global(.global-wrapper) {
+		width: 100%;
+		min-height: calc(100vh - 8rem); /* Account for navbar/footer */
+		position: relative;
+	}
+
+	/* Responsive Container - Modern SaaS max-width */
+	:global(.global-container) {
+		width: 100%;
+		max-width: var(--container-max-width, 1280px);
+		margin-left: auto;
+		margin-right: auto;
+		padding-left: var(--container-padding-mobile, 1rem);
+		padding-right: var(--container-padding-mobile, 1rem);
+	}
+
+	/* Responsive padding adjustments */
+	@media (min-width: 640px) {
+		:global(.global-container) {
+			padding-left: var(--container-padding-tablet, 1.5rem);
+			padding-right: var(--container-padding-tablet, 1.5rem);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		:global(.global-container) {
+			padding-left: var(--container-padding-desktop, 2rem);
+			padding-right: var(--container-padding-desktop, 2rem);
+		}
+	}
+
+	/* Ultrawide screen optimization (1440p and above) */
+	@media (min-width: 1440px) {
+		:global(.global-container) {
+			max-width: var(--container-max-width, 1280px);
+			/* Keep container at 1280px even on ultrawide for optimal readability */
+		}
+	}
+
+	/* Ultra-ultrawide screens (2560px+) - maintain readability */
+	@media (min-width: 2560px) {
+		:global(.global-container) {
+			max-width: var(--container-max-width, 1280px);
+			/* Still maintain 1280px for consistency and readability */
+		}
+	}
+
+	/* Section spacing utilities */
+	:global(.section-spacing) {
+		padding-top: var(--section-spacing-mobile, 3rem);
+		padding-bottom: var(--section-spacing-mobile, 3rem);
+	}
+
+	@media (min-width: 768px) {
+		:global(.section-spacing) {
+			padding-top: var(--section-spacing-tablet, 4rem);
+			padding-bottom: var(--section-spacing-tablet, 4rem);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		:global(.section-spacing) {
+			padding-top: var(--section-spacing-desktop, 5rem);
+			padding-bottom: var(--section-spacing-desktop, 5rem);
+		}
+	}
+
+	/* Fluid typography scaling */
+	:global(.text-responsive) {
+		font-size: clamp(1rem, 2.5vw, 1.125rem);
+		line-height: 1.6;
+	}
+
+	:global(.text-responsive-lg) {
+		font-size: clamp(1.5rem, 4vw, 2.25rem);
+		line-height: 1.3;
+	}
+
+	:global(.text-responsive-xl) {
+		font-size: clamp(2rem, 5vw, 3rem);
+		line-height: 1.2;
+	}
+
+	:global(.text-responsive-2xl) {
+		font-size: clamp(2.5rem, 6vw, 4rem);
+		line-height: 1.1;
+	}
+
+	/* Consistent spacing utilities */
+	:global(.space-y-global > * + *) {
+		margin-top: 1.5rem;
+	}
+
+	@media (min-width: 768px) {
+		:global(.space-y-global > * + *) {
+			margin-top: 2rem;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		:global(.space-y-global > * + *) {
+			margin-top: 2.5rem;
+		}
+	}
+
+	/* Responsive grid gap utilities */
+	:global(.gap-global) {
+		gap: 1.5rem;
+	}
+
+	@media (min-width: 768px) {
+		:global(.gap-global) {
+			gap: 2rem;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		:global(.gap-global) {
+			gap: 2.5rem;
+		}
+	}
+
+	/* Responsive gap for smaller spacing */
+	:global(.gap-global-sm) {
+		gap: 1rem;
+	}
+
+	@media (min-width: 768px) {
+		:global(.gap-global-sm) {
+			gap: 1.5rem;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		:global(.gap-global-sm) {
+			gap: 2rem;
+		}
+	}
+}
+
+@layer utilities {
+	/* Page animations */
+	@keyframes pageFadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes pageScaleIn {
+		from {
+			transform: scale(0.98);
+		}
+		to {
+			transform: scale(1);
+		}
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@keyframes slideInUp {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	/* Animation utilities */
+	:global(.animate-fade-in) {
+		animation: fadeIn 0.5s ease-out;
+	}
+
+	:global(.animate-slide-up) {
+		animation: slideInUp 0.6s ease-out;
+	}
+
+	/* Responsive display utilities */
+	:global(.hide-mobile) {
+		display: none;
+	}
+
+	@media (min-width: 640px) {
+		:global(.hide-mobile) {
+			display: block;
+		}
+	}
+
+	:global(.hide-desktop) {
+		display: block;
+	}
+
+	@media (min-width: 1024px) {
+		:global(.hide-desktop) {
+			display: none;
+		}
+	}
+
+	/* Consistent padding utilities */
+	:global(.py-global) {
+		padding-top: 3rem;
+		padding-bottom: 3rem;
+	}
+
+	@media (min-width: 768px) {
+		:global(.py-global) {
+			padding-top: 4rem;
+			padding-bottom: 4rem;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		:global(.py-global) {
+			padding-top: 5rem;
+			padding-bottom: 5rem;
+		}
+	}
+
+	:global(.py-global-sm) {
+		padding-top: 2rem;
+		padding-bottom: 2rem;
+	}
+
+	@media (min-width: 768px) {
+		:global(.py-global-sm) {
+			padding-top: 2.5rem;
+			padding-bottom: 2.5rem;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		:global(.py-global-sm) {
+			padding-top: 3rem;
+			padding-bottom: 3rem;
+		}
+	}
+
+	:global(.py-global-lg) {
+		padding-top: 4rem;
+		padding-bottom: 4rem;
+	}
+
+	@media (min-width: 768px) {
+		:global(.py-global-lg) {
+			padding-top: 5rem;
+			padding-bottom: 5rem;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		:global(.py-global-lg) {
+			padding-top: 6rem;
+			padding-bottom: 6rem;
+		}
+	}
+
+	/* Consistent horizontal padding */
+	:global(.px-global) {
+		padding-left: 1rem;
+		padding-right: 1rem;
+	}
+
+	@media (min-width: 640px) {
+		:global(.px-global) {
+			padding-left: 1.5rem;
+			padding-right: 1.5rem;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		:global(.px-global) {
+			padding-left: 2rem;
+			padding-right: 2rem;
+		}
+	}
+
+	/* Safe area support for mobile devices */
+	:global(.safe-top) {
+		padding-top: env(safe-area-inset-top);
+	}
+
+	:global(.safe-bottom) {
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	:global(.safe-left) {
+		padding-left: env(safe-area-inset-left);
+	}
+
+	:global(.safe-right) {
+		padding-right: env(safe-area-inset-right);
+	}
+
+	/* Container query support for advanced responsiveness */
+	:global(.container-responsive) {
+		container-type: inline-size;
+	}
+
+	/* Smooth transitions for theme changes */
+	:global(*),
+	:global(*::before),
+	:global(*::after) {
+		transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+		transition-duration: 200ms;
+	}
+
+	/* Prevent transitions on page load */
+	:global(.no-transition),
+	:global(.no-transition *) {
+		transition: none !important;
+		animation: none !important;
+	}
+}
+
